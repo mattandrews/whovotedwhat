@@ -83,6 +83,7 @@
 					<input type="text" name="postcode" placeholder="your postcode" />
 					<input type="submit" class="btn" value="&raquo;" />
 				</form>
+				<p class="prefix">(enter postcodes in the format 'SW4 9JP' -- London only, obviously)
 
 				<div class="hr"><span>or</span></div>
 
