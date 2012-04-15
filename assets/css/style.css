@@ -1,0 +1,225 @@
+body {
+	font: 12px/18px arial;
+	color: #333;
+	background: #333;
+}
+
+#container {
+	margin: 20px auto;
+	background: #efefef;
+	float: none;
+	overflow: hidden;
+	text-align: center;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	padding: 20px 0;
+	-webkit-box-shadow: 0px 0px 15px #000;
+	-moz-box-shadow: 0px 0px 15px #000;
+	box-shadow: 0px 0px 15px #000;
+}
+
+.intro {
+	font-size: 14px;
+	line-height: 22px;
+	font-weight: bold;
+}
+
+.main {
+	margin: 0px auto;
+	text-align: center;
+	float: none;
+	padding: 20px;
+}
+
+.choosy {
+	margin-top: 20px;
+	text-align: center;
+}
+
+label {
+	margin-right: 5px;
+}
+
+h2,
+label {
+	font-size: 22px;
+	font-weight: bold;
+}
+
+h3 {
+	font-size: 14px;
+	color: #999;
+	margin: 5px 0 15px 0;
+}
+
+.choosy input[type=text] {
+	font-size: 22px;
+	font-weight: bold;
+	color: #999;
+	padding: 0px 5px;
+}
+
+.btn {
+	background: #cc0000;
+	color: #fff;
+	font-size: 24px;
+	font-weight: bold;
+	padding: 0px 10px;
+	border: 2px solid #fff;
+	-webkit-box-shadow: 0px 0px 3px #999;
+	-moz-box-shadow: 0px 0px 3px #999;
+	box-shadow: 0px 0px 3px #999;
+}
+
+.hr {
+	text-align: center;
+	border-bottom: 1px solid #ccc;
+	-webkit-box-shadow: 0px 1px 1px #fff;
+	-moz-box-shadow: 0px 1px 1px #fff;
+	box-shadow: 0px 1px 1px #fff;
+	position: relative;
+	width: 85%;
+	margin: 25px auto;
+}
+
+.hr span {
+	position: absolute;
+	top: -9px;
+	background: #efefef;
+	padding: 0 11px;
+	color: #999;
+	font-size: 14px;
+}
+
+a { color: #1f7c96; }
+a:hover { color: #4fa8c1; }
+
+h2.all { text-align: center;}
+
+table {
+    background: #fff;    
+    border: 1px solid #ccc;
+ 	margin: 0px auto;
+ 	text-align: left;
+}
+
+table thead {
+    background: #ccc;
+    font-weight: bold;
+}
+
+table th, td {
+    padding: 10px 5px;
+}
+
+table td {
+     border-right: 1px solid #ccc;   
+}
+
+table td:last-child {
+    border-right:0;
+}
+
+table tbody tr:nth-child(odd) {
+    background: #eee;
+}
+
+table tbody tr:hover {
+    background: #ccc;    
+    cursor: pointer;
+}
+
+.share {
+	margin: 20px 0;
+	clear: left;
+}
+
+.avg_down,
+.avg_up {
+	display: block;
+	background: url(../img/arrow_up.png) no-repeat;
+	padding-left: 20px;
+}
+
+.avg_down {
+	background-image: url(../img/arrow_down.png);
+}
+
+.badges {
+	width: 100%;
+	float: left;
+}
+
+.badge {
+    width: 130px;
+    display: inline-block;    
+    background-color: #ccc;
+    margin: 0px 10px 10px 0px;
+    padding: 4px;
+    border: 1px solid #999;
+    text-align: left;
+    padding-left: 20px;
+    background-position: 0 5px;
+    font-weight: bold;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    position: relative;
+}
+
+.badge:last-child {
+     margin-right: 0;   
+}
+
+.badge b {
+	position: absolute;
+	right: 7px;
+	top: 5px;
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	background: #333;
+}
+
+.bnp b { background: url(../img/icons/bnp.png); }
+.greens b { background: url(../img/icons/greens.png); }
+.tories b { background: url(../img/icons/tories.png); }
+.labour b { background: url(../img/icons/labour.png); }
+
+.results {
+	font-weight: normal;
+	text-align: right;
+	background: url(../img/rosette-grey.png) no-repeat right 4px;
+	padding-right: 20px;
+}
+
+ul.tags {
+    margin: 20px 0;
+}
+
+ul.tags li {
+    display: inline-block;    
+}
+
+ul.tags li a {
+    display: inline-block;
+    background: #333;
+    text-decoration: none;
+    padding: 3px 6px;
+    margin: 3px;
+    color: #ccc;
+    -webkit-border-radius: 3px;
+    font-weight: bold;
+}
+
+ul.tags li a:hover {
+    background: #ccc;
+    color: #333
+}
+
+.initially-off { display: none; }
+
+.prefix {
+	margin-top: 20px;
+}
