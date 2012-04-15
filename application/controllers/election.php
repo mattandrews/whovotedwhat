@@ -15,7 +15,7 @@ class Election extends CI_Controller {
 			$this->db->select('wards.old_code, wards.new_code, codes.ward, codes.district, codes.postcode');
 			$this->db->join('wards', 'codes.ward_code = wards.new_code');
 			$ward_data = $this->db->get_where('codes', array('codes.postcode' => $user_postcode))->row_array();
-
+			$this->session->set_flashdata('postcode', $user_postcode);
 			redirect('london/2008/' . url_title($ward_data['district'], 'dash', TRUE) . '/' . $ward_data['new_code']);
 		} else {
 			$this->db->order_by('district_name');
