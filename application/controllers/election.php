@@ -53,7 +53,7 @@ class Election extends CI_Controller {
 		$data['ward_data'] = $this->db->get_where('wards', array('new_code' => $new_code))->row_array();
 
 		// get ward votes
-		$this->db->order_by('votes DESC');
+		$this->db->order_by('cat_id ASC, votes DESC');
 		$this->db->join('vote_candidates', 'votes_normalised.candidate_id = vote_candidates.candidate_id');
 		$this->db->join('vote_categories', 'vote_candidates.category_id = vote_categories.cat_id');
 		$data['votes'] = $this->db->get_where('votes_normalised', array('ward_id' => $new_code))->result_array();

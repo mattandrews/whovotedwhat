@@ -42,7 +42,17 @@
 	  		  	height: 400
 	  		  },
 	          pieSliceText: 'value',
-	          sliceVisibilityThreshold: 1/1000
+	          sliceVisibilityThreshold: 1/1000,
+	          slices:
+	          	<?php $str_arr = array(); 
+	          	foreach($votes as $i=>$v) {
+	          		if($v['colour'] != '') {
+	          			$str_arr[] = $i . ": {color: '" . $v['colour'] . "'}";
+          			}
+          		} 
+          		$str = implode(", ", $str_arr);
+          		echo '{' . $str . '}';
+          		?>
 	        };
 
 	        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
