@@ -29,34 +29,46 @@ class Election extends CI_Controller {
 
 	function render($new_code) {
 		
-		$this->output->cache(60);
+		//$this->output->cache(60);
+		//$this->output->enable_profiler(TRUE);
 
 		$data['mode'] = 'votes';
-		//$this->output->enable_profiler(TRUE);
 
 		// used for calculating if voting average is statistically significant
 		$data['bounds'] = array('lower' => 75, 'upper' => 120);
 
 		// get national results first
-		$this->db->select('votes_normalised.candidate_id, candidate_name, AVG(votes) AS average');
-		$this->db->join('vote_candidates', 'votes_normalised.candidate_id = vote_candidates.candidate_id');
-		$this->db->group_by('votes_normalised.candidate_id');
+		$this->db->select('election_votes.person_id, election_people.name AS person_name, AVG(election_votes.votes) AS average, election_parties.name AS party_name, election_parties.colour');
+		$this->db->join('election_people', 'election_votes.person_id = election_people.id');
+		$this->db->join('election_parties', 'election_people.party_id = election_parties.id');
+		$this->db->group_by('election_votes.person_id');
 		$this->db->order_by('average DESC');
-		$overall_votes = $this->db->get_where('votes_normalised', array('vote_candidates.category_id' => '1'))->result_array();
+		$where = array(
+			'election_votes.category_id' => 1,
+			'election_votes.election_id' => 1
+		);
+		$overall_votes = $this->db->get_where('election_votes', $where)->result_array();
 
 		// now process them into a comparable form
 		foreach($overall_votes as $v) {
-			$data['overall_votes'][$v['candidate_id']] = $v['average'];
+			$data['overall_votes'][$v['person_id']] = $v['average'];
 		}
 
 		// get ward data
 		$data['ward_data'] = $this->db->get_where('wards', array('new_code' => $new_code))->row_array();
 
 		// get ward votes
+		$this->db->select('election_votes.person_id AS candidate_id, votes, election_people.name AS candidate_name, cat_name, cat_id, election_parties.name AS party_name');
+		$this->db->join('election_people', 'election_votes.person_id = election_people.id');
+		$this->db->join('election_parties', 'election_people.party_id = election_parties.id');
+		$this->db->join('election_categories', 'election_votes.category_id = election_categories.cat_id');
 		$this->db->order_by('votes DESC');
-		$this->db->join('vote_candidates', 'votes_normalised.candidate_id = vote_candidates.candidate_id');
-		$this->db->join('vote_categories', 'vote_candidates.category_id = vote_categories.cat_id');
-		$data['votes'] = $this->db->get_where('votes_normalised', array('ward_id' => $new_code))->result_array();
+		$where = array(
+			'election_votes.category_id' => 1,
+			'election_votes.election_id' => 1,
+			'ward_id' => $new_code
+		);
+		$data['votes'] = $this->db->get_where('election_votes', $where)->result_array();
 
 		if (!empty($data['votes'])) {
 
@@ -92,6 +104,7 @@ class Election extends CI_Controller {
 			$data['mode'] = "error";
 		}
 
+		print_r($data['votes']);
 		$this->load->view('results', $data);
 	}
 
@@ -157,6 +170,29 @@ class Election extends CI_Controller {
 	}
 	*/
 
+	function fix3() {
+		set_time_limit(0);
+		
+		$this->db->truncate('election_votes');
+		$this->db->join('election_candidates', 'votes_normalised.candidate_id = election_candidates.id');
+		$this->db->join('election_people', 'election_candidates.person_id = election_people.id');
+		$votes = $this->db->get('votes_normalised')->result_array();
+
+		foreach($votes as $v) {
+			$arr = array(
+				'vote_id' => $v['vote_id'],
+				'ward_id' => $v['ward_id'],
+				'person_id' => $v['person_id'],
+				'votes' => $v['votes'],
+				'election_id' => 1,
+				'category_id' => $v['category_id']
+			);
+			$this->db->insert('election_votes', $arr);
+		}
+		echo 'all done!';
+	}
+
+
 	function district($district_name) {
 		$data['mode'] = 'wards';
 		$district_name = str_replace('-', ' ', $district_name);
@@ -166,57 +202,49 @@ class Election extends CI_Controller {
 	}
 
 	function stats($mode) {
+
+		$this->db->limit(1);
+		$this->db->join('wards', 'election_votes.ward_id = wards.new_code');
+		$this->db->join('election_people', 'election_votes.person_id = election_people.id');
+		$this->db->join('election_parties', 'election_people.party_id = election_parties.id');
+		$where = array('election_id' => 1, 'category_id' => 1);
+
 		switch($mode) {
 			case "most-bnp":
-				$this->db->limit(1);
 				$this->db->order_by('votes DESC');
-				$this->db->join('wards', 'votes_normalised.ward_id = wards.new_code');
-				$ward = $this->db->get_where('votes_normalised', array('candidate_id' => 1))->row_array();
+				$where['election_parties.id'] = 1;
 				break;
 			case "most-tory":
-				$this->db->limit(1);
 				$this->db->order_by('votes DESC');
-				$this->db->join('wards', 'votes_normalised.ward_id = wards.new_code');
-				$ward = $this->db->get_where('votes_normalised', array('candidate_id' => 6))->row_array();
+				$where['election_parties.id'] = 6;
 				break;
 			case "most-labour":
-				$this->db->limit(1);
 				$this->db->order_by('votes DESC');
-				$this->db->join('wards', 'votes_normalised.ward_id = wards.new_code');
-				$ward = $this->db->get_where('votes_normalised', array('candidate_id' => 7))->row_array();
+				$where['election_parties.id'] = 7;
 				break;
 			case "most-green":
-				$this->db->limit(1);
 				$this->db->order_by('votes DESC');
-				$this->db->join('wards', 'votes_normalised.ward_id = wards.new_code');
-				$ward = $this->db->get_where('votes_normalised', array('candidate_id' => 3))->row_array();
+				$where['election_parties.id'] = 3;
 				break;
 			case "least-bnp":
-				$this->db->limit(1);
 				$this->db->order_by('votes ASC');
-				$this->db->join('wards', 'votes_normalised.ward_id = wards.new_code');
-				$ward = $this->db->get_where('votes_normalised', array('candidate_id' => 1))->row_array();
+				$where['election_parties.id'] = 1;
 				break;
 			case "least-tory":
-				$this->db->limit(1);
 				$this->db->order_by('votes ASC');
-				$this->db->join('wards', 'votes_normalised.ward_id = wards.new_code');
-				$ward = $this->db->get_where('votes_normalised', array('candidate_id' => 6))->row_array();
+				$where['election_parties.id'] = 6;
 				break;
 			case "least-labour":
-				$this->db->limit(1);
 				$this->db->order_by('votes ASC');
-				$this->db->join('wards', 'votes_normalised.ward_id = wards.new_code');
-				$ward = $this->db->get_where('votes_normalised', array('candidate_id' => 7))->row_array();
+				$where['election_parties.id'] = 7;
 				break;
 			case "least-green":
-				$this->db->limit(1);
 				$this->db->order_by('votes ASC');
-				$this->db->join('wards', 'votes_normalised.ward_id = wards.new_code');
-				$ward = $this->db->get_where('votes_normalised', array('candidate_id' => 3))->row_array();
+				$where['election_parties.id'] = 3;
 				break;
 		}
 
+		$ward = $this->db->get_where('election_votes', $where)->row_array();
 		redirect('london/2008/' . url_title($ward['district_name'], 'dash', TRUE) . '/' . $ward['new_code']);
 	}
 

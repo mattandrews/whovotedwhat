@@ -199,7 +199,7 @@
 						<?php foreach($votes as $v) { ?>
 							<?php if($v['cat_id'] == '1') { ?>
 								<tr>
-									<td><?php echo $v['candidate_name']; ?></td>
+									<td><?php echo '<strong>' . $v['candidate_name'] . '</strong><br />' . $v['party_name']; ?></td>
 									<td><?php echo $v['votes']; ?></td>
 									<td><?php echo round($overall_votes[$v['candidate_id']]); ?></td>
 									<td><?php $diff = $v['votes'] / $overall_votes[$v['candidate_id']] * 100; 
