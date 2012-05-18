@@ -58,7 +58,7 @@ class Election extends CI_Controller {
 		$data['ward_data'] = $this->db->get_where('wards', array('new_code' => $new_code))->row_array();
 
 		// get ward votes
-		$this->db->select('election_votes.person_id AS candidate_id, votes, election_people.name AS candidate_name, cat_name, cat_id, election_parties.name AS party_name');
+		$this->db->select('election_votes.person_id AS candidate_id, votes, election_people.name AS candidate_name, cat_name, cat_id, election_parties.name AS party_name, colour');
 		$this->db->join('election_people', 'election_votes.person_id = election_people.id');
 		$this->db->join('election_parties', 'election_people.party_id = election_parties.id');
 		$this->db->join('election_categories', 'election_votes.category_id = election_categories.cat_id');
@@ -69,6 +69,7 @@ class Election extends CI_Controller {
 			'ward_id' => $new_code
 		);
 		$data['votes'] = $this->db->get_where('election_votes', $where)->result_array();
+
 
 		if (!empty($data['votes'])) {
 
@@ -104,7 +105,6 @@ class Election extends CI_Controller {
 			$data['mode'] = "error";
 		}
 
-		print_r($data['votes']);
 		$this->load->view('results', $data);
 	}
 
