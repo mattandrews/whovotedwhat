@@ -4,7 +4,7 @@
 	<title><?php if($mode == 'votes') { echo $ward_data['ward_name'] . ' | ' . $ward_data['district_name']; ?> | <?php } else if ($mode == 'wards') { echo $wards[0]['district_name'] . ' | '; } ?>London Mayoral Election 2008 Votes</title>
 	<link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>assets/css/reset.css" />
 	<link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>assets/css/grid.css" />
-	<link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>assets/css/style.css" />
+	<link type="text/css" rel="stylesheet" href="<?php echo base_url(); ?>assets/css/style.css?v=2" />
 	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 
@@ -22,40 +22,78 @@
 	      google.setOnLoadCallback(drawChart);
 	      function drawChart() {
 	        var data = new google.visualization.DataTable();
-	        data.addColumn('string', 'Candidate & Party');
-	        data.addColumn('number', 'Votes');
-	        data.addRows([
-	        	<?php $i=0; foreach($votes as $v) { ?>
-	        		<?php if($v['cat_id'] == '1') { ?>
-	        			['<?php echo addslashes($v['candidate_name'] . ' (' . $v['party_name'] . ')'); ?>', <?php echo $v['votes']; ?>],
-	        		<?php } ?>
-	        	<?php $i++; } ?>
-	        ]);
+	      	
+	      	<?php if($graphMode == 'single') { ?>
+		        data.addColumn('string', 'Candidate & Party');
+		        data.addColumn('number', 'Votes');
+		        data.addRows([
+		        	<?php $i=0; foreach($votes as $v) { ?>
+		        		<?php if($v['cat_id'] == '1') { ?>
+		        			['<?php echo addslashes($v['candidate_name'] . ' (' . $v['party_name'] . ')'); ?>', <?php echo $v['votes']; ?>],
+		        		<?php } ?>
+		        	<?php $i++; } ?>
+		        ]);
 
-	        var options = {
-	          backgroundColor: '#efefef',
-	          is3D: true,
-	  		  chartArea: {
-	  		  	left: 20,
-	  		  	top: 20,
-	  		  	width: 700,
-	  		  	height: 400
-	  		  },
-	          pieSliceText: 'value',
-	          sliceVisibilityThreshold: 1/1000,
-	          slices:
-	          	<?php $str_arr = array(); 
-	          	foreach($votes as $i=>$v) {
-	          		if($v['colour'] != '') {
-	          			$str_arr[] = $i . ": {color: '" . $v['colour'] . "'}";
-          			}
-          		} 
-          		$str = implode(", ", $str_arr);
-          		echo '{' . $str . '}';
-          		?>
-	        };
+		        var options = {
+		          backgroundColor: '#efefef',
+		          is3D: true,
+		  		  chartArea: {
+		  		  	left: 20,
+		  		  	top: 20,
+		  		  	width: 700,
+		  		  	height: 400
+		  		  },
+		          pieSliceText: 'value',
+		          sliceVisibilityThreshold: 1/1000,
+		          slices:
+		          	<?php $str_arr = array(); 
+		          	foreach($votes as $i=>$v) {
+		          		if($v['colour'] != '') {
+		          			$str_arr[] = $i . ": {color: '" . $v['colour'] . "'}";
+	          			}
+	          		} 
+	          		$str = implode(", ", $str_arr);
+	          		echo '{' . $str . '}';
+	          		?>
+		        };
+		       	var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+		        
+	        <?php } else if ($graphMode == 'dual') { ?>
+				data.addColumn('string', 'Candidate & Party');
+			    data.addColumn('number', "This ward's votes");
+			    data.addColumn('number', "Average London votes");
+			    data.addRows([
+				    <?php $i=0; foreach($votes as $v) { ?>
+		        		<?php if($v['cat_id'] == '1') { ?>
+				        	['<?php echo addslashes($v['candidate_name'] . ' (' . $v['party_name'] . ')'); ?>', 
+				        	<?php echo $v['votes']; ?>,
+				        	<?php echo round($overall_votes[$v['candidate_id']]); ?>],
+			        	<?php } ?>
+				    <?php } ?>
+			    ]);
 
-	        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+			    var options = {
+			      	pointSize: 3,
+		    	  	focusTarget: 'category',
+		          	backgroundColor: '#efefef',
+		          	legend: 'top',
+		          	hAxis: {		
+						textPosition: 'out',
+						viewWindowMode: 'pretty'
+					},
+		  		  	chartArea: {
+		  		  		left: 100,
+		  		  		top: 20,
+		  		  		width: 600,
+		  		  		height: 400
+		  		  	},
+		  		  	series: {
+	                	0: {color: '#79bd8f'}, 
+	                	1: {color: '#beeb9f'}
+	                }
+	        	};
+	        	var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+			<?php } ?>
 	        chart.draw(data, options);
 	      }
 	    </script>
@@ -80,17 +118,22 @@
 
 	<div id="container" class="fourteen-col">
 		
-		<a href="<?php echo site_url(); ?>"><img class="logo" src="<?php echo base_url(); ?>assets/img/logo.png" alt="Who voted what?" /></a>
+		<a href="<?php echo site_url(); ?>"><img class="logo" src="<?php echo base_url(); ?>assets/img/logo2.png" alt="Who voted what?" /></a>
 
 		<div class="main">
 
 			<?php if($mode == 'choose') { ?>
 
-				<p class="intro">Want to know if anyone voted BNP on your street? Curious to see if your area of London is more Tory than Labour? Or just wondering if you're the only Green voter in your district? Here's the data, in handy graph form so you don't have to think. Don't forget to vote this May. </p>
+				<p class="intro">Want to know if anyone voted BNP on your street? Curious to see if your area of London is more Tory than Labour? Or just wondering if you're the only Green voter in your district? Here's the data, in handy graph form so you don't have to think. Includes data from 2008 and 2012.</p>
 
 				<form method="post" class="choosy" action="<?php echo site_url('election'); ?>">
 					<label>See voting stats for</label>
 					<input type="text" name="postcode" placeholder="your postcode" />
+					<select name="year">
+						<?php foreach($this->years as $y) { ?>
+							<option value="<?php echo $y; ?>"><?php echo $y; ?></option>
+						<?php } ?>
+					</select>
 					<input type="submit" class="btn" value="&raquo;" />
 				</form>
 				<p class="prefix">(enter postcodes in the format 'SW4 9JP' -- London only, obviously)</p>
@@ -101,7 +144,7 @@
 
 				<ul class="tags initially-off">
 					<?php foreach($districts as $d) { ?>
-						<li><a href="<?php echo site_url('london/2008/' . url_title($d['district_name'], 'dash', TRUE)); ?>"><?php echo $d['district_name']; ?></a></li>
+						<li><a href="<?php echo site_url('london/2012/' . url_title($d['district_name'], 'dash', TRUE)); ?>"><?php echo $d['district_name']; ?></a></li>
 					<?php } ?>
 				</ul>
 
@@ -110,14 +153,14 @@
 				<h2>Some interesting sample queries</h2>
 				<p class="prefix">Which ward had...</p>
 				<ul class="tags">
-					<li><a href="<?php echo site_url('london/2008/stats/most-bnp'); ?>">The most BNP voters</a></li>
-					<li><a href="<?php echo site_url('london/2008/stats/most-tory'); ?>">The most Tory voters</a></li>
-					<li><a href="<?php echo site_url('london/2008/stats/most-labour'); ?>">The most Labour voters</a></li>
-					<li><a href="<?php echo site_url('london/2008/stats/most-green'); ?>">The most Green voters</a></li>
-					<li><a href="<?php echo site_url('london/2008/stats/least-bnp'); ?>">The least BNP voters</a></li>
-					<li><a href="<?php echo site_url('london/2008/stats/least-tory'); ?>">The least Tory voters</a></li>
-					<li><a href="<?php echo site_url('london/2008/stats/least-labour'); ?>">The least Labour voters</a></li>
-					<li><a href="<?php echo site_url('london/2008/stats/least-green'); ?>">The least Green voters</a></li>
+					<li><a href="<?php echo site_url('london/2012/stats/most-bnp'); ?>">The most BNP voters</a></li>
+					<li><a href="<?php echo site_url('london/2012/stats/most-tory'); ?>">The most Tory voters</a></li>
+					<li><a href="<?php echo site_url('london/2012/stats/most-labour'); ?>">The most Labour voters</a></li>
+					<li><a href="<?php echo site_url('london/2012/stats/most-green'); ?>">The most Green voters</a></li>
+					<li><a href="<?php echo site_url('london/2012/stats/least-bnp'); ?>">The least BNP voters</a></li>
+					<li><a href="<?php echo site_url('london/2012/stats/least-tory'); ?>">The least Tory voters</a></li>
+					<li><a href="<?php echo site_url('london/2012/stats/least-labour'); ?>">The least Labour voters</a></li>
+					<li><a href="<?php echo site_url('london/2012/stats/least-green'); ?>">The least Green voters</a></li>
 				</ul>
 
 			<?php } else if ($mode == 'error') { ?> 
@@ -132,7 +175,7 @@
 
 				<ul class="tags">
 					<?php foreach($wards as $w) { ?>
-						<li><a href="<?php echo site_url('london/2008/' . url_title($w['district_name'], 'dash', TRUE) . '/' . $w['new_code']); ?>"><?php echo $w['ward_name']; ?></a></li>
+						<li><a href="<?php echo site_url('london/2012/' . url_title($w['district_name'], 'dash', TRUE) . '/' . $w['new_code']); ?>"><?php echo $w['ward_name']; ?></a></li>
 					<?php } ?>
 				</ul>
 
@@ -143,16 +186,16 @@
 					<h3><?php echo $ward_data['district_name']; ?></h3>
 				</div>
 				<div class="six-col edge">
-					<p class="intro results">Highest scoring candidate for this ward <br /><strong><?php echo $winner['candidate']; ?></strong></p>
+					<p class="intro results">Highest scoring candidate for this ward <br /><strong><?php echo $winner['candidate'] . ' (' . $winner['party_name'] .')'; ?></strong></p>
 				</div>
 
 				<div class="badges">
 
 					<?php
-						$diff['BNP'] = array('diff' => $votes_candidates[1] / $overall_votes[1] * 100, 'class' => 'bnp');
-						$diff['Tory Party'] = array('diff' => $votes_candidates[6] / $overall_votes[6] * 100, 'class' => 'tories');
-						$diff['Labour Party'] = array('diff' => $votes_candidates[7] / $overall_votes[7] * 100, 'class' => 'labour');
-						$diff['Green Party'] = array('diff' => $votes_candidates[3] / $overall_votes[3] * 100, 'class' => 'greens');
+						$diff['BNP'] = array('diff' => $votes_candidates[$badges['bnp']] / $overall_votes[$badges['bnp']] * 100, 'class' => 'bnp');
+						$diff['Tory Party'] = array('diff' => $votes_candidates[$badges['tory']] / $overall_votes[$badges['tory']] * 100, 'class' => 'tories');
+						$diff['Labour Party'] = array('diff' => $votes_candidates[$badges['labour']] / $overall_votes[$badges['labour']] * 100, 'class' => 'labour');
+						$diff['Green Party'] = array('diff' => $votes_candidates[$badges['green']] / $overall_votes[$badges['green']] * 100, 'class' => 'greens');
 
 						$badge_html = '';
 						foreach($diff as $party=>$d) {
@@ -164,7 +207,7 @@
 						}
 
 						if ($badge_html != '') {
-							echo '<div class="hr"><span>Results</span></div>';
+							echo '<div class="hr"><span>Results for ' . $year . '</span></div>';
 							echo '<span>Badges for this ward: </span>';
 							echo $badge_html;
 						}
@@ -172,20 +215,21 @@
 				</div>
 
 				<div class="twelve-col">
-					<div id="chart_div" style="width: 700px; height: 400px;"></div>
+					<?php if ($graphMode == 'single') { ?>
+						<div id="chart_div" style="width: 700px; height: 400px;"></div>
+					<?php } else if ($graphMode == 'dual') { ?>
+						<div id="chart_div" style="width: 700px; height: 500px; margin-bottom: 20px;"></div>
+					<?php } ?>
 				</div>
 
 				<div class="share">
-					<a href="https://twitter.com/share" class="twitter-share-button" data-lang="en" data-url="<?php echo current_url(); ?>" data-related="mattpointblank" data-text="London Mayoral Election 2008 vote stats for <?php echo $this->session->flashdata('postcode'); ?>" data-hashtags="whovotedwhat" data-size="large">Tweet</a>
+					<a href="https://twitter.com/share" class="twitter-share-button" data-lang="en" data-url="<?php echo current_url(); ?>" data-related="mattpointblank" data-text="London Mayoral Election <?php echo $year; ?> vote stats for <?php echo $ward_data['ward_name']; ?>" data-hashtags="whovotedwhat" data-size="large">Tweet</a>
 					<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 				</div>
 
 				<div id="disqus_thread"></div>
 				<script type="text/javascript">
-				    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-				    var disqus_shortname = 'whovotedwhat'; // required: replace example with your forum shortname
-
-				    /* * * DON'T EDIT BELOW THIS LINE * * */
+				    var disqus_shortname = 'whovotedwhat'; 
 				    (function() {
 				        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
 				        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
@@ -225,7 +269,7 @@
 			<div class="hr"><span>Credits</span></div>
 			<p>This tool is a hack by by <a href="http://mattandrews.info">Matt Andrews</a>. I'm a web developer, not a statistician. Don't sue me.</p>
 
-			<p>Source data taken from <a href="https://docs.google.com/a/guardian.co.uk/spreadsheet/ccc?key=0AonYZs4MzlZbdDhhQWE5RzFVcTlSRXRQN3REN1ZPNEE#gid=1">London Elects' Mayoral Election 2008 data</a> and Chris Bell's supremely useful <a href="http://www.doogal.co.uk/UKPostcodes.php">UK Postcodes data</a>.</p>
+			<p>Source data taken from London Elects' Mayoral Election <a href="https://docs.google.com/a/guardian.co.uk/spreadsheet/ccc?key=0AonYZs4MzlZbdDhhQWE5RzFVcTlSRXRQN3REN1ZPNEE#gid=1">2008</a> / <a href="https://docs.google.com/a/guardian.co.uk/spreadsheet/ccc?key=0AonYZs4MzlZbdHdFUU92YU1GMGNfc0pTbnAxMF81T2c#gid=0">2012</a> data and Chris Bell's supremely useful <a href="http://www.doogal.co.uk/UKPostcodes.php">UK Postcodes data</a>.</p>
 
 
 		</div>

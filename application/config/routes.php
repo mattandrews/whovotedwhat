@@ -67,11 +67,11 @@
 $route['default_controller'] = "election";
 $route['404_override'] = '';
 
-$route['london/2008/stats/(:any)'] = "election/stats/$1";
-$route['london/2008/(:any)/(:any)'] = "election/render/$2";
-$route['london/2008/(:any)'] = "election/district/$1";
+$route['london/(:num)/stats/(:any)'] = "election/stats/$1/$2";
+$route['london/(:num)/(:any)/(:any)'] = "election/render/$1/$3";
+$route['london/(:num)/(:any)'] = "election/district/$1/$2";
 
-$route['london/2008'] = "election";
+$route['london/(:num)'] = "election";
 $route['london'] = "election";
 
 

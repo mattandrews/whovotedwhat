@@ -53,11 +53,16 @@ h3 {
 	margin: 5px 0 15px 0;
 }
 
-.choosy input[type=text] {
+.choosy input[type=text],
+.choosy select {
 	font-size: 22px;
 	font-weight: bold;
 	color: #999;
 	padding: 0px 5px;
+}
+
+.choosy select {
+	padding-right: 0;
 }
 
 .btn {

@@ -1,0 +1,6 @@
+todo
+
+- put ward name in tweet
+- dual bar charts: one for ward, one for average
+- show rank for each candidate across all wards
+- compare against previous year's result
