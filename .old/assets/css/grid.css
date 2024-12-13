@@ -1,0 +1,19 @@
+.fifteen-col,.fourteen-col,.thirteen-col,.twelve-col,.eleven-col,.ten-col,.nine-col,.eight-col,.seven-col,.six-col,.five-col,.four-col,.three-col,.two-col,.one-col{float:left; margin-right:20px; }
+
+.sixteen-col{clear:both;position:relative;width:940px;}
+.fifteen-col{width:880px;}
+.fourteen-col{width:820px;}
+.thirteen-col{width:760px;}
+.twelve-col{width:700px;}
+.eleven-col{width:640px;}
+.ten-col{width:580px;}
+.nine-col{width:520px;}
+.eight-col{width:460px;}
+.seven-col{width:400px;}
+.six-col{width:340px;}
+.five-col{width:280px;}
+.four-col{width:220px;}
+.three-col{width:160px;}
+.two-col{width:100px;}
+.one-col{width:40px;}
+.edge{margin-right:0!important;}

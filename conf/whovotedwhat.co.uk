@@ -1,0 +1,5 @@
+server {
+    server_name whovotedwhat.co.uk www.whovotedwhat.co.uk;
+    root /var/www/whovotedwhat.co.uk;
+    index index.html;
+}

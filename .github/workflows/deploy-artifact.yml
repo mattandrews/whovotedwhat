@@ -1,0 +1,51 @@
+name: Deploy to VPS
+on: push
+
+env:
+  APP_CWD: /var/www/whovotedwhat.co.uk
+  SSH_KEY: ~/.ssh/id_ed25519
+  SSH_HOST_NAME: hetzner
+  
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up SSH key
+        run: |
+          env
+          mkdir -p ~/.ssh
+          echo "${{ secrets.ARTIFACT_SSH_KEY }}" > ${{ env.SSH_KEY }}
+          chmod 600 ${{ env.SSH_KEY }}
+          ssh-keyscan -p 22 -t ed25519 ${{ secrets.ARTIFACT_HOST }} >> ~/.ssh/known_hosts
+          cat >>~/.ssh/config <<END
+          Host ${{ env.SSH_HOST_NAME }}
+            HostName ${{ secrets.ARTIFACT_HOST }}
+            User ${{ secrets.ARTIFACT_USERNAME }}
+            IdentityFile ${{ env.SSH_KEY }}
+            StrictHostKeyChecking no
+          END
+
+      - name: Deploy code to server
+        run: |
+          rsync -azrP --exclude='.*' --delete-after --delete-excluded . $SSH_HOST_NAME:$APP_CWD
+
+      - name: Copy Nginx configuration
+        run: |
+          echo "Copying nginx config file"
+          ssh $SSH_HOST_NAME "sudo cp $APP_CWD/conf/whovotedwhat.co.uk /etc/nginx/sites-enabled"
+          echo "Nginx config file copied."
+
+      - name: Check Nginx configuration
+        run: |
+          echo "Checking nginx config"
+          ssh $SSH_HOST_NAME "sudo /usr/sbin/nginx -t 2>&1"
+          echo "Nginx configuration check completed."
+
+      - name: Restart Nginx service
+        if: success()
+        run: |
+          ssh $SSH_HOST_NAME "sudo /bin/systemctl restart nginx"
+          echo "Nginx service restarted successfully"
